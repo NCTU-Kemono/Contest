@@ -37,7 +37,7 @@ int main() {
         pii p = q.front(); q.pop();
         for (int d = 0 ; d < 6 ; d++) {
             pii np = make_pair(p.F + dx[d], p.S + dy[d]);
-            if (np.F < 0 || np.F > MAXN || np.S < 0 || np.S > MAXN) continue;
+            if (np.F < 0 || np.F >= MAXN || np.S < 0 || np.S >= MAXN) continue;
             if (B[np.F][np.S] == 0) continue;
             if (B[np.F][np.S] == 1) ans++;
             else {
