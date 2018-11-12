@@ -1,0 +1,72 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long LL;
+const int MAXN = 1000 + 5;
+const LL INF = 0x3f3f3f3f3f3f3f3fLL;
+struct F {
+    LL a, b; F() {}
+    F(LL a, LL b) : a(a), b(b) {
+    }
+    void trim() {
+        LL g = __gcd(a, b);
+        a /= g; b /= g;
+    }
+};
+F max(F a, F b) {
+    a.a *= b.b;
+    a.b *= b.a;
+    if (a.a < b.a) return b;
+    else return a;
+}
+F min(F a, F b) {
+    a.a *= b.b;
+    a.b *= b.a;
+    if (a.a > b.a) return b;
+    else return a;
+}
+struct Edge {
+    LL u, v;
+    LL w;
+};
+F MMC(vector<vector<Edge> > &G) {
+    int n = G.size(); G.resize(n + 1);
+    for (int i = 0 ; i < n ; i++)
+        G[n].push_back({n, i, 0});
+    LL d[MAXN][MAXN];
+    int s = n++;
+    for (int i= 0 ; i <= n ; i++)
+        for (int j = 0 ; j < n ; j++)
+            d[i][j] = INF;
+    d[0][s] = 0;
+    for (int k = 0 ; k < n ; k++)
+        for (int i = 0 ; i < n ; i++)
+            for (auto p : G[i])
+                if (d[k][i] + p.w < d[k + 1][p.v])
+                    d[k + 1][p.v] = d[k][i] + p.w;
+
+    F ans = F(INF, 1);
+    for (int i = 0 ; i < n ; i++) {
+        if (d[n][i] == INF) continue;
+        F maxW = F(-INF, 1);
+        for (int k = 0 ; k < n - 1 ; k++) {
+            maxW = max(maxW, F(d[n][i] - d[k][i], n - k));
+        }
+        ans = min(ans, maxW);
+    }
+    return ans;
+}
+int main() {
+    ios_base::sync_with_stdio(false); cin.tie(0);
+    int t; cin >> t; while (t--) {
+        int n, m; cin >> n >> m;
+        vector<vector<Edge> > G(n);
+        for (int i = 0 ; i < m ; i++) {
+            LL u, v, w; cin >> u >> v >> w;
+            u--, v--;
+            G[u].push_back({u, v, w});
+        }
+        F ans = MMC(G);
+        ans.trim();
+        cout << ans.a << ' ' << ans.b << '\n';
+    }
+}
